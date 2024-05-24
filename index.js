@@ -45,7 +45,7 @@ async function run() {
 
       const options = {
         // Include only the `title` and `imdb` fields in the returned document
-        projection: { title: 1, price: 1, service_id: 1, img:1 },
+        projection: { title: 1, price: 1, service_id: 1, img: 1 },
       };
 
       const result = await serviceCollection.findOne(query, options);
@@ -54,14 +54,14 @@ async function run() {
 
     //booking
 
-    app.get('/bookings', async(req, res)=>{
+    app.get('/bookings', async (req, res) => {
       console.log(req.query.email);
-      let query= {};
-      if(req.query?.email){
-        query= {email: req.query.email}
+      let query = {};
+      if (req.query?.email) {
+        query = { email: req.query.email }
 
       }
-      const result= await bookingCollection.find().toArray();
+      const result = await bookingCollection.find().toArray();
       res.send(result);
     })
 
@@ -72,9 +72,24 @@ async function run() {
       res.send(result);
     });
 
-    app.delete('/bookings/:id', async(req, res)=>{
+    app.patch('/bookings/:id', async (req, res) => {
       const id= req.params.id;
-      const query= {_id: new ObjectId(id)}
+      const filter= {_id: new ObjectId(id)};
+      const updatedBooking = req.body;
+      console.log(updatedBooking);
+      const updateDoc= {
+        $set: {
+          status: updatedBooking.status
+        },
+      };
+      const result= await bookingCollection.updateOne(filter, updateDoc);
+      res.send(result);
+
+  });
+
+    app.delete('/bookings/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
       const result = await bookingCollection.deleteOne(query);
       res.send(result);
     })
